@@ -52,15 +52,15 @@ export const login = async (req, res) => {
       return res.status(400).json({ message: "Incorrect password" });
 
     // Luego de generado el usuario, se genera el token
-    const token = await createAccessToken({ id:userFound._id });
+    const token = await createAccessToken({ id: userFound._id });
     res.cookie("token", token); // Se guarda el token en una cookie
 
     res.json({
-      _id:userFound._id,
-      username:userFound.username,
-      email:userFound.email,
-      createdAt:userFound.createdAt,
-      updatedAt:userFound.updatedAt,
+      _id: userFound._id,
+      username: userFound.username,
+      email: userFound.email,
+      createdAt: userFound.createdAt,
+      updatedAt: userFound.updatedAt,
     });
   } catch (err) {
     res.status(500).json({ message: err.message }); // Si hay un error, se muestra el mensaje la crear usuario, al generar el token, o al guardar el token en la cookie, o al mostrar el usuario guardado en la base de datos
@@ -71,8 +71,27 @@ export const logout = async (req, res) => {
   // res.clearCookie("token");
   // res.json({ message: "Logout" });
   // return res.sendStatus(200)
-  res.cookie("token", "", { // Se guarda el token en una cookie
+  res.cookie("token", "", {
+    // Se guarda el token en una cookie
     expires: new Date(0),
   });
   return res.sendStatus(200);
-}
+};
+
+export const profile = async (req, res) => {
+  //consulta a la DB si el usuario existe
+  const userFound = await User.findById(req.user.id);
+  // console.log(req.user.id)
+
+  // console.log(userFound);
+  if (!userFound) return res.status(400).json({ message: "User not found" });
+  return res.json({
+    _id: userFound._id,
+    username: userFound.username,
+    email: userFound.email,
+    createdAt: userFound.createdAt,
+    updatedAt: userFound.updatedAt,
+  });
+
+  // return res.json('profile')
+};
